@@ -1,0 +1,38 @@
+*{
+	 padding : 0;
+	 margin : 0;
+	 border : 0;
+}
+body{
+	 background-image : url('tech.png');
+	 background-attachment : fixed;
+	 background-size : 100% auto;
+}
+.blended_grid{
+	 display : block;
+	 width : 900px;
+	 overflow : auto;
+	 margin : 30px auto 0 auto;
+}
+.pageHeader{
+	 background-color : rgba(255,255,255,0.4);
+	 background-image : url('bb.png');
+	 float : left;
+	 clear : none;
+	 height : 200px;
+	 width : 900px;
+}
+.pageContent{
+	 background-color : rgba(96,239,255,0.4);
+	 float : left;
+	 clear : none;
+	 height : 600px;
+	 width : 900px;
+}
+.pageFooter{
+	 background-color : rgba(0,9,181,0.4);
+	 float : left;
+	 clear : none;
+	 height : 100px;
+	 width : 900px;
+}
