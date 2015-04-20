@@ -95,7 +95,7 @@
 (def forbidden-words [":)" "the" "a" "an" "to" "that" "was" "is" "will" "on" "u" "you" "this"  
                             "can" "could" "my" "his" "has" "from" "each" "of" "one" "our" "we"
                             "he" "and" "for" "us" "her" "\"FaceTime\"" "it" "but" "when" "its" "cery" "don't"
-                             "with" "It" "She" "I'm" "in" "if" "I" "no"]) ;define more words later
+                             "with" "it" "she" "i'm" "in" "if" "i" "no"]) ;define more words later
 
 (defn remove-words-from-sentence
   [sentence words]
@@ -117,20 +117,35 @@
 (def tokenized-reviews (distinct (for [ i (range (count pre-tokens))] 
                                     (string/split (nth pre-tokens i) #" ")))) 
 
-(def w-matrix (for [i (range (count pre-tokens) )] 
-                  (for [j (range (count tokens))] (if (.contains (nth pre-tokens i) (nth tokens j)) 1 0)))) ;defining the W matrix
+;(def w-matrix (for [i (range (count pre-tokens) )] 
+;                  (for [j (range (count tokens))] (if (.contains (nth pre-tokens i) (nth tokens j)) 1 0)))) ;defining the W matrix
 
-(def w-matrix-alternative (for [i (range (count tokenized-reviews) )] 
-                  (for [j (range (count tokens))] (if (= (nth tokenized-reviews i) (nth tokens j)) 1 0)))) 
+;(def w-matrix-alternative (for [i (range (count tokenized-reviews) )] 
+;                  (for [j (range (count tokens))] (if (= (nth tokenized-reviews i) (nth tokens j)) 1 0)))) 
 
-(def sequence-of-frequencies (apply  map + w-matrix)) ;defining matrix of frequencies
+;(def sequence-of-frequencies (apply  map + w-matrix)) ;defining matrix of frequencies
 
-(def proba (for [i (range (count tokenized-reviews) )] 
-                     (for [j (range (count tokens))] 
-      					 (if (.contains (nth tokenized-reviews i) (nth tokens j)) 1 0)
-                                                                                 ))) ;--> DOBROOO
+;(def proba (for [i (range (count tokenized-reviews) )] 
+;                     (for [j (range (count tokens))] 
+;      					 (if (.contains (nth tokenized-reviews i) (nth tokens j)) 1 0)  ))) ;
 
 
+
+(def frequencies-of-words-reviews (map frequencies tokenized-reviews)) 
+
+(def frequencies-matrix (for [i (range (count frequencies-of-words-reviews))] (for [j (range (count tokens))] 
+    (if (= ((nth frequencies-of-words-reviews i) (nth tokens j)) nil) 0 ((nth frequencies-of-words-reviews i) (nth tokens j)))))) ;matrix where element ij represents occurences of token j in review i
+
+
+(def sequence-of-frequencies (apply  map + (for [i (range (count frequencies-of-words-reviews))] (for [j (range (count tokens))] 
+    (if (= ((nth frequencies-of-words-reviews i) (nth tokens j)) nil) 0  1))))) ;sequence where element i represents the number of reviews that contains token i
+
+(defn tf-idf [tf_ij N df_i] (* tf_ij (java.lang.Math/log (/ N df_i)))) ;function for getting w_ij 
+
+(def number-of-reviews (count sequence-of-reviews) )
+
+(def w-matrix (for [i (range (count frequencies-matrix))] (for [j (range (count sequence-of-frequencies))] 
+    (tf-idf (nth (nth frequencies-matrix i) j) number-of-reviews (nth sequence-of-frequencies j)))))
 
 
 
