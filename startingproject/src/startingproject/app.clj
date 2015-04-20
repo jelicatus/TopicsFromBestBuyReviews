@@ -90,4 +90,50 @@
          :as :json} :headers) :body) :reviews)] 
      (def sequence-of-reviews (map string/lower-case (for [i (range(count reviews-body))] ((reviews-body i) :comment)))) )
 
+(def punctuation-marks ["." "!" ":" ","]) ;maybe this doesn't need to be kept
+
+(def forbidden-words [":)" "the" "a" "an" "to" "that" "was" "is" "will" "on" "u" "you" "this"  
+                            "can" "could" "my" "his" "has" "from" "each" "of" "one" "our" "we"
+                            "he" "and" "for" "us" "her" "\"FaceTime\"" "it" "but" "when" "its" "cery" "don't"
+                             "with" "It" "She" "I'm" "in" "if" "I" "no"]) ;define more words later
+
+(defn remove-words-from-sentence
+  [sentence words]
+  (let [pattern (->> (for [w words] (str "\\b\\Q" w "\\E\\b"))
+                     (string/join "|")
+                     (format "(%s)\\s*"))]
+    (.trim (.replaceAll sentence pattern "")))) ;function for removing forbidden words
+
+(def pre-pre-tokens (for [j (range (count sequence-of-reviews))] 
+                      (remove-words-from-sentence (nth sequence-of-reviews j) forbidden-words))) ;removing forbidden words
+
+(def pre-tokens (for [s pre-pre-tokens] 
+        (-> s ((apply comp 
+                 (for [s punctuation-marks] #(.replace %1 s ""))))))) ;removing punctuation marks
+
+(def tokens (distinct (flatten (for [ i (range (count pre-tokens))] 
+                                 (string/split (nth pre-tokens i) #" "))))) ;getting sequence of tokens
+
+(def tokenized-reviews (distinct (for [ i (range (count pre-tokens))] 
+                                    (string/split (nth pre-tokens i) #" ")))) 
+
+(def w-matrix (for [i (range (count pre-tokens) )] 
+                  (for [j (range (count tokens))] (if (.contains (nth pre-tokens i) (nth tokens j)) 1 0)))) ;defining the W matrix
+
+(def w-matrix-alternative (for [i (range (count tokenized-reviews) )] 
+                  (for [j (range (count tokens))] (if (= (nth tokenized-reviews i) (nth tokens j)) 1 0)))) 
+
+(def sequence-of-frequencies (apply  map + w-matrix)) ;defining matrix of frequencies
+
+(def proba (for [i (range (count tokenized-reviews) )] 
+                     (for [j (range (count tokens))] 
+      					 (if (.contains (nth tokenized-reviews i) (nth tokens j)) 1 0)
+                                                                                 ))) ;--> DOBROOO
+
+
+
+
+
+
+
 
