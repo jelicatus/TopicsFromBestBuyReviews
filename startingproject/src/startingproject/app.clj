@@ -147,6 +147,28 @@
 (def w-matrix (for [i (range (count frequencies-matrix))] (for [j (range (count sequence-of-frequencies))] 
     (tf-idf (nth (nth frequencies-matrix i) j) number-of-reviews (nth sequence-of-frequencies j)))))
 
+( def nmfopt (jml.options.NMFOptions.))
+        (set! (.epsilon nmfopt) (- java.lang.Math/E 5) )
+        (set! (.calc_OV nmfopt) false)
+        (set! (.verbose nmfopt) true)
+        (set! (.maxIter nmfopt) 50)
+        (set! (.nClus nmfopt) 15)
+		
+(def NMFclustering (jml.clustering.NMF. nmfopt))
+
+(def data (into-array (map double-array w-matrix))) 
+ 
+(def nmfclustering (jml.clustering.NMF. nmfopt))
+(. nmfclustering (feedData data))
+(. nmfclustering (clustering nil))
+(. java.lang.System/out (println "Basis Matrix:"))
+(jml.matlab.Matlab/printMatrix (jml.matlab.Matlab/full (. nmfclustering (getCenters))))
+(. java.lang.System/out (println "Indicator Matrix:"))
+(jml.matlab.Matlab/printMatrix (jml.matlab.Matlab/full (. nmfclustering (getIndicatorMatrix))))
+  
+ 
+
+
 
 
 
