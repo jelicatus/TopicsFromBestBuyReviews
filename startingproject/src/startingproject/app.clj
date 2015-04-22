@@ -152,7 +152,7 @@
         (set! (.calc_OV nmfopt) false)
         (set! (.verbose nmfopt) true)
         (set! (.maxIter nmfopt) 50)
-        (set! (.nClus nmfopt) 15)
+        (set! (.nClus nmfopt) 2)
 		
 (def NMFclustering (jml.clustering.NMF. nmfopt))
 
@@ -165,10 +165,17 @@
 (jml.matlab.Matlab/printMatrix (jml.matlab.Matlab/full (. nmfclustering (getCenters))))
 (. java.lang.System/out (println "Indicator Matrix:"))
 (jml.matlab.Matlab/printMatrix (jml.matlab.Matlab/full (. nmfclustering (getIndicatorMatrix))))
+
+(def matrix  (. nmfclustering (getIndicatorMatrix)))
   
- 
+(def t-matrix (apply mapv vector (mapv #(vec (.getRow matrix %))
+        (range (.getRowDimension matrix))))) 
 
+(def topics-with-all-tokens (map #(zipmap tokens %) t-matrix ))
 
+(def topics-with-sorted-weight-of-tokens ( map sort-by second topics-with-all-tokens))
+
+(def 15-words-for-topics (map #(take-last 15 %) topics-with-sorted-weight-of-tokens))
 
 
 
