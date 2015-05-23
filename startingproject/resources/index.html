@@ -1,25 +1,42 @@
 <!DOCTYPE html>
+<html>
 <head>
-	 <meta http-equiv="content-type" content="text/html; charset=utf-8">
-	 <link rel="stylesheet" type="text/css" href="public/blended_layout.css">
-	 <link rel="stylesheet" type="text/css" href="public/jQCloud-master/jQCloud-master/jqcloud/jqcloud.css">
-	 <title>Page Title</title>
-	 <meta name="description" content="Write some words to describe your html page">
-	 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
-	 <script src="public/jquery/jquery-1.11.3.min.js"></script>
-	 <script src="public/jQCloud-master/jQCloud-master/jqcloud/jqcloud-1.0.4.min.js"></script>	 	 
-	 <script type="text/javascript">
-	 
-	 </script>
+
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+<link rel="stylesheet" type="text/css" href="public/blendedlayout.css"/>
+<title>Page Title</title>
+<script type="text/javascript"
+	src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdn.rawgit.com/lucaong/jQCloud/master/jqcloud/jqcloud-1.0.4.js"></script>
+
 </head>
 <body>
-<div class="blended_grid">
-	  <div class="pageHeader">
-	  </div>
-	  <div class="pageContent">
-	  </div>
-	  <div class="pageFooter">
-	  </div>
-</div>
+	<div>
+	 <form method="POST" action="/searchforproducts">
+	 Product:
+		 <input type="text" name="product" />
+		 <input type="submit" value="Search for product" />
+	Choose product category (...ovde combo...)	 
+	 </form>
+	 
+	 <div id="products">
+	  <h2 class="name"> </h2>
+	  <img class="product-image" src=""/>
+	  <p class="manufacturer"> </p>
+	  <p class="prices"> </p>
+	  <p class="long-description"> </p>
+	  View product on bestbuy.com <h1 class="url"> </h1>
+	 </div>
+	
+	</div>
+	
+	<div class="blended_grid">
+		<div class="pageHeader">
+			<div class="example" id="example"></div>
+		</div>
+		<div class="pageContent"></div>
+		<div class="pageFooter"></div>
+	</div>
 </body>
 </html>
