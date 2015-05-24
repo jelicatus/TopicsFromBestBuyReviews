@@ -120,8 +120,8 @@
 (set! (.verbose nmfopt) true)
 (set! (.maxIter nmfopt) 50)
 (set! (.nClus nmfopt) 2)
-		
-(def NMFclustering (jml.clustering.NMF. nmfopt))
+
+(def nmfclustering (jml.clustering.NMF. nmfopt))
 
 (defn feed-data [nmfclustering data] (. nmfclustering (feedData data)))
 (defn set-clustering [nmfclustering param] (. nmfclustering (clustering param)))
