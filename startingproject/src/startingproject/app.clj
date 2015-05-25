@@ -16,7 +16,6 @@
 
 (def products (atom ""))
 
-(def mapasajtova (atom {}))
 
 ;(en/deftemplate homepage
 ;  (en/xml-resource "index.html")
@@ -46,16 +45,12 @@
      [:p.salePrice] (en/content (str "salePrice " (product :salePrice) " "))
      [:p.long-description] (en/content (str (product :longDescription) " "))                        
      [:a.url] (en/set-attr :href (str (product :url)))
-     [:input.sku] (en/set-attr :name (str (product :sku)))
+     [:input.sku] (en/set-attr :value (str (product :sku)))
      
      )
  )
   
 
-(defn redirect 
-  [id]
-  (response/redirect (@mapasajtova id)) ;@ posto je atom
-  )
 
 ;(defn napunimapu
  ; [url]
@@ -139,13 +134,6 @@
   (let [reviews-body (((client/get (str "http://api.remix.bestbuy.com/v1/reviews(sku=" sku ")?format=json&apiKey=5qxg5sxjbbxa9maxpfrqvqjw&show=comment")
         {:form-params "body"
          :content-type :json
-         :as :json} :headers) :body) :reviews)] 
-     (def sequence-of-reviews (map string/lower-case (map :comment reviews-body))) ))
-
-(defn get-reviews1 [sku] 
-  (let [reviews-body (((client/get (str "http://api.remix.bestbuy.com/v1/reviews(sku=" sku ")?format=json&apiKey=5qxg5sxjbbxa9maxpfrqvqjw&show=comment")
-        {:form-params "body"
-         :content-type :json
          :as :json} :headers) :body) :reviews),
         sequence-of-reviews (map string/lower-case (map :comment reviews-body)),
         pre-pre-tokens (map #(remove-words-from-sentence % forbidden-words) sequence-of-reviews),
@@ -155,7 +143,7 @@
         frequencies-of-words-reviews (map frequencies tokenized-reviews),
         frequencies-matrix (for [i (range (count frequencies-of-words-reviews))] (for [j (range (count tokens))] 
          (if (= ((nth frequencies-of-words-reviews i) (nth tokens j)) nil) 0 ((nth frequencies-of-words-reviews i) (nth tokens j))))),
-        sequence-of-frequencies (apply  map + (for [i (range (count frequencies-of-words-reviews))] (for [j (range (count tokens))] 
+        sequence-of-frequencies (apply map + (for [i (range (count frequencies-of-words-reviews))] (for [j (range (count tokens))] 
          (if (= ((nth frequencies-of-words-reviews i) (nth tokens j)) nil) 0  1)))),
         number-of-reviews (count sequence-of-reviews),
         w-matrix (for [i (range (count frequencies-matrix))] (for [j (range (count sequence-of-frequencies))] 
@@ -172,92 +160,20 @@
 
 
 (defn findouttopics [sku]
-  (get-reviews sku)
+  (get-reviews sku)  
   )
 
-(def pre-pre-tokens (for [j (range (count sequence-of-reviews))] 
-                      (remove-words-from-sentence (nth sequence-of-reviews j) forbidden-words))) ;removing forbidden words
-
-(def pre-tokens (for [s pre-pre-tokens] 
-        (-> s ((apply comp 
-                 (for [s punctuation-marks] #(.replace %1 s ""))))))) ;removing punctuation marks
-
-(def tokens (distinct (flatten (for [ i (range (count pre-tokens))] 
-                                 (string/split (nth pre-tokens i) #" "))))) ;getting sequence of tokens
-
-(def tokenized-reviews (distinct (for [ i (range (count pre-tokens))] 
-                                    (string/split (nth pre-tokens i) #" ")))) 
-
-(def frequencies-of-words-reviews (map frequencies tokenized-reviews)) 
-
-(def frequencies-matrix (for [i (range (count frequencies-of-words-reviews))] (for [j (range (count tokens))] 
-    (if (= ((nth frequencies-of-words-reviews i) (nth tokens j)) nil) 0 ((nth frequencies-of-words-reviews i) (nth tokens j)))))) ;matrix where element ij represents occurences of token j in review i
-
-
-(def sequence-of-frequencies (apply map + (for [i (range (count frequencies-of-words-reviews))] (for [j (range (count tokens))] 
-    (if (= ((nth frequencies-of-words-reviews i) (nth tokens j)) nil) 0  1))))) ;sequence where element i represents the number of reviews that contains token i
-
-
-
-(def number-of-reviews (count sequence-of-reviews) )
-
-(def w-matrix (for [i (range (count frequencies-matrix))] (for [j (range (count sequence-of-frequencies))] 
-    (tf-idf (nth (nth frequencies-matrix i) j) number-of-reviews (nth sequence-of-frequencies j)))))
-
-(def nmfopt (jml.options.NMFOptions.))
-        (set! (.epsilon nmfopt) (- java.lang.Math/E 5) )
-        (set! (.calc_OV nmfopt) false)
-        (set! (.verbose nmfopt) true)
-        (set! (.maxIter nmfopt) 50)
-        (set! (.nClus nmfopt) 2)
-		
-(def NMFclustering (jml.clustering.NMF. nmfopt))
-
-(def data (into-array (map double-array w-matrix))) 
-
-
- 
-(def nmfclustering (jml.clustering.NMF. nmfopt))
-(. nmfclustering (feedData data))
-(. nmfclustering (clustering nil))
-(. java.lang.System/out (println "Basis Matrix:"))
-(jml.matlab.Matlab/printMatrix (jml.matlab.Matlab/full (. nmfclustering (getCenters))))
-(. java.lang.System/out (println "Indicator Matrix:"))
-(jml.matlab.Matlab/printMatrix (jml.matlab.Matlab/full (. nmfclustering (getIndicatorMatrix))))
-
-(def matrix  (. nmfclustering (getIndicatorMatrix)))
-  
-(def t-matrix (apply mapv vector (mapv #(vec (.getRow matrix %))
-        (range (.getRowDimension matrix))))) 
-
-(def topics-with-all-tokens (map #(zipmap tokens %) t-matrix ))
-
-;(def topics-with-sorted-weight-of-tokens ( map sort-by second topics-with-all-tokens)) ;nesto ne radi odjednom
-
-(def topics-with-sorted-weight-of-tokens (for [i (range (count topics-with-all-tokens))](sort-by val > (nth topics-with-all-tokens i))))
-
-(def words-for-topics (map #(take 15 %) topics-with-sorted-weight-of-tokens)) 
-
-
-
-(defn top-level-funtion [sku]
-  (let [x (get-reviews sku),
-        y (map fj3 x)]
-    (rep y))
-  )
 
 ;defnisanje ruta
 (defroutes app*
   ;(GET "/" request (homepage request))
   (GET "/" request (probanje request))
   (GET "/proba" request (probanje request))
-  (GET "/:id" [id] (redirect id))
   (POST "/searchforproducts" [product]       
         (searchforproducts  product)
            (fill-products (into () (:data @products)))
        )
-  (POST "/findouttopics" [sku]       
-        (findouttopics sku)
+  (POST "/findouttopics" request (findouttopics ((request :params) :sku))
        )
 ;  (POST "/napunimapu" request (napunimapu (-> request :params :url)) (response/redirect "/") )
   )
