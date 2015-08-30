@@ -51,8 +51,8 @@
                                     {:form-params "body"
                                      :content-type :json
                                      :as :json} :headers) :body) :reviews),
-         forbidden-words (string/split (slurp "stopwords.txt") #", "),
-         punctuation-marks (string/split (slurp "punctuationmarks.txt") #" "),
+         forbidden-words (conj (string/split (slurp "resources/stopwords.txt") #", ") ""),
+         punctuation-marks (string/split (slurp "resources/punctuationmarks.txt") #" "),
          sequence-of-reviews (map string/lower-case (map :comment reviews-body)),
          pre-pre-tokens (map #(remove-words-from-sentence % forbidden-words) sequence-of-reviews),
          pre-tokens (for [s pre-pre-tokens] (-> s ((apply comp (for [s punctuation-marks] #(.replace %1 s "")))))),

@@ -4,7 +4,9 @@
     <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>Welcome to bestbuytopicreviews</title>
   </head>
-  <body>
+  <body class="blended_grid">
+      <div class="pageHeader">
+      </div>
     <!-- navbar -->
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="container">
@@ -24,9 +26,11 @@
       </div>
     </div>
 
+    <div class="pageContent">
     <div class="container">
       {% block content %}
       {% endblock %}
+    </div>
     </div>
     <!-- scripts and styles -->
     {% style "/assets/bootstrap/css/bootstrap.min.css" %}
@@ -44,6 +48,8 @@
     </script>
     {% block page-scripts %}
     {% endblock %}
+    <div class="pageFooter">
+      </div>
   </body>
 </html>
 

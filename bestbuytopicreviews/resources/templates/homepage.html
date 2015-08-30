@@ -1,4 +1,6 @@
 
+{% extends "base.html" %}
+{% block content %}
 <div>
 	 <form method="POST" action="/searchforproducts">
 	 Product:
@@ -8,33 +10,26 @@
 	Choose product category (...ovde combo...)
 	 </form>
 
-	 <div id="products">
-	  <h2 class="name"> </h2>
-	  <img class="product-image" src=""/>
-	  <p class="manufacturer"> </p>
-	  <p class="regularPrice"> </p>
-	  <p class="onSale"> </p>
-	  <p class="percentSavings"> </p>
-	  <p class="salePrice"> </p>
-	  <p class="long-description"> </p>
-	  View product <a class="url" href="" target="_blank"> here </a>
+	<div id="products">
+      {% for item in results %}
+	  <h2 class="name"> {{item.name}} </h2>
+	  <img class="product-image" src="{{item.image}}"/>
+	  <p class="manufacturer"> {{item.manufacturer}} </p>
+	  <p class="regularPrice"> {{item.regularPrice}} </p>
+	  <p class="onSale"> {{item.onSale}} </p>
+	  <p class="percentSavings"> {{item.percentSavings}} </p>
+	  <p class="salePrice"> {{item.salePrice}} </p>
+	  <p class="long-description"> {{item.longDescriptione}} </p>
+	  View product <a class="url" href="{{item.url}}" target="_blank"> here </a>
 
 	  <form method="POST" action="/findouttopics">
         {% csrf-field %}
 	  	<input class="sku" type="text" visible="false" name="sku" />
-  		<input type="submit" name="" value="Find out topics!" />
+  		<input type="submit" name="{{item.sku}}" value="Find out topics!" />
 	  </form>
-	 </div>
-
-	</div>
-
-	<div class="blended_grid">
-		<div class="pageHeader">
-			<div class="example" id="example"></div>
-		</div>
-		<div class="pageContent"></div>
-		<div class="pageFooter"></div>
+      {% endfor %}
 	</div>
 
 	<div id="example" style="width: 550px; height: 350px;"></div>
 </div>
+{% endblock %}
