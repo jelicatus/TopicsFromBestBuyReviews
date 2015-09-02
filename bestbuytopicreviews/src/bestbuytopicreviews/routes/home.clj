@@ -12,6 +12,7 @@
 (defroutes home-routes
   (GET "/" [] (index-page))
   (POST "/searchforproducts" [product] (index-page product))
+  ;should put request as parameter, will do after filtering products with 100+ reviews
   (POST "/findouttopics" [request] (util/get-reviews 7619002)))
 
 ;za definisanje ruta i hendleri za requestove (post get)
