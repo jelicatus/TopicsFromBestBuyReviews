@@ -22,7 +22,7 @@
     (.trim (.replaceAll sentence pattern ""))))
 
 (defn searchforproducts [product]
-     (((client/get (str "http://api.remix.bestbuy.com/v1/products(name=" product "*&categoryPath.name=%22Cell%20Phones%22)?show=name,sku,url,image,manufacturer,regularPrice,onSale,percentSavings,salePrice,longDescription&pageSize=30&page=30&apiKey=5qxg5sxjbbxa9maxpfrqvqjw&format=json")
+     (((client/get (str "http://api.remix.bestbuy.com/v1/products(longDescription=" product "*&customerReviewCount>100)?show=name,sku,url,image,manufacturer,regularPrice,onSale,percentSavings,salePrice,longDescription&pageSize=30&page=1&apiKey=5qxg5sxjbbxa9maxpfrqvqjw&format=json")
                                  {:form-params "body"
                                   :content-type :json
                                   :as :json}
@@ -53,7 +53,21 @@
             (apply #(hc/html %) (interleave (map str tag-vector)
                                     (repeat " ")))]))
 
+(defn take-total-number-of-pages [sku]
+  (((client/get (str "http://api.remix.bestbuy.com/v1/reviews(sku=" sku ")?format=json&apiKey=5qxg5sxjbbxa9maxpfrqvqjw&show=comment&pageSize=100&page=1")
+                                    {:form-params "body"
+                                     :content-type :json
+                                     :as :json} :headers) :body) :totalPages))
 
+(defn request-reviews [sku page-no]
+  (((client/get (str "http://api.remix.bestbuy.com/v1/reviews(sku=" sku ")?format=json&apiKey=5qxg5sxjbbxa9maxpfrqvqjw&show=comment&pageSize=100&page=" page-no)
+                                    {:form-params "body"
+                                     :content-type :json
+                                     :as :json} :headers) :body) :reviews))
+
+(defn collect-all-reviews [total-page-number sku]
+  (let [reviews []]
+        (for [i (range 1 total-page-number)] (conj reviews (request-reviews sku i)))))
 
 ;reviews-body - gets the reviews attribute of returned json object using BestBuy API
 ;sequence-of-reviews - returns a sequence whose elements are reviews
@@ -75,10 +89,8 @@
 ;topics-with-sorted-weight-of-tokens - returns a sequence with sorted weight of tokens for each topic
 ;words-for-topics - returns a sequence with 15 most relevant words for each topic
 (defn get-reviews [sku]
-  ( let [reviews-body (((client/get (str "http://api.remix.bestbuy.com/v1/reviews(sku=" sku ")?format=json&apiKey=5qxg5sxjbbxa9maxpfrqvqjw&show=comment")
-                                    {:form-params "body"
-                                     :content-type :json
-                                     :as :json} :headers) :body) :reviews),
+  ( let [total-page-number (take-total-number-of-pages sku)
+         reviews-body (flatten (collect-all-reviews total-page-number sku)),
          forbidden-words (string/split (slurp "resources/stopwords.txt") #", "),
          punctuation-marks (string/split (slurp "resources/punctuationmarks.txt") #" "),
          sequence-of-reviews (map string/lower-case (map :comment reviews-body)),
