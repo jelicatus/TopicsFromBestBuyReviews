@@ -32,26 +32,34 @@
 (defn tag-cloud [tag-vector]
   (let [counts (map last tag-vector)
         max-count (apply max counts)
-        min-count (apply min counts)
+        min-count  (apply min counts)
         min-size 90.0
         max-size 200.0
-        color-fn (fn [val]
-                   (let [b (min (- 255 (Math/round (* val 255))) 200)]
-                     (str "rgb(" b "," b "," b ")")))
+        color-fn (fn [v]
+                   (let [b (min (- 255 (Math/round (* v 255))) 200)]
+                    (str "rgb(" b "," b "," b ")")))
         tag-fn (fn [[tag c]]
-                 (let [weight (/ (- (Math/log c) (Math/log min-count))
+                 (let [b (rand-int 100)
+                       weight (/ (- (Math/log c) (Math/log min-count))
                                  (- (Math/log max-count) (Math/log min-count)))
                        size (+ min-size (Math/round (* weight
                                                        (- max-size min-size))))
                        color (color-fn (* weight 1.0))]
-                   [:a {:href (:url tag)
-                        :style (str "font-size: " size "%;" "color:" color)}
-                    (:name tag)]))]
+                   [:a {;:href (:url tag)
+                        :style (str "font-size: " size "%;"  " position: relative;" " top: " (+ b c)"px; "  " left: -" (+ b c) "px;"  "color:" color)}
+                    (str tag)]))]
+(hc/html
+           [:h2 "Themes"]
+           [:div.tag-cloud {:style (str "margin-left: 15%")}
+            (hc/html
 
-           [:h2 "Tags"]
-           [:div.tag-cloud
-            (apply #(hc/html %) (interleave (map str tag-vector)
-                                    (repeat " ")))]))
+                                 (map tag-fn tag-vector)
+                                    );))
+            ]
+)))
+
+;(defn tag-cloud [tag-vector]
+ ;(str (first tag-vector)))
 
 (defn take-total-number-of-pages [sku]
   (((client/get (str "http://api.remix.bestbuy.com/v1/reviews(sku=" sku ")?format=json&apiKey=5qxg5sxjbbxa9maxpfrqvqjw&show=comment&pageSize=100&page=1")
@@ -89,7 +97,7 @@
 ;topics-with-sorted-weight-of-tokens - returns a sequence with sorted weight of tokens for each topic
 ;words-for-topics - returns a sequence with 15 most relevant words for each topic
 (defn get-reviews [sku]
-  ( let [total-page-number (take-total-number-of-pages sku)
+  (let [total-page-number (take-total-number-of-pages sku)
          reviews-body (flatten (collect-all-reviews total-page-number sku)),
          forbidden-words (string/split (slurp "resources/stopwords.txt") #", "),
          punctuation-marks (string/split (slurp "resources/punctuationmarks.txt") #" "),
@@ -117,5 +125,5 @@
          topics-with-sorted-weight-of-tokens (for [i (range (count topics-with-all-tokens))](sort-by val > (nth topics-with-all-tokens i))),
          tag-vectors (map #(take 15 %) topics-with-sorted-weight-of-tokens)
          ]
-;    (map #(map str %) tag-vectors)))
-   (map #(tag-cloud %) tag-vectors)) )
+ ;  (map #(map str %) tag-vectors)))
+   (map tag-cloud tag-vectors)) )

@@ -8,12 +8,21 @@
 		 <input type="submit" value="Search for product" />
 	Choose product category (...ovde combo...)
 	 </form>
-
+     {% if clouds|empty? %}
+    {% else %}
+    <div>
+     {% for cloud in clouds %}
+        {{cloud|safe}}
+        <br/><br/><br/><br/><br/>
+         {% endfor %}
+    </div>
+    {% endif %}
 	<div id="products">
       {% for item in results %}
+     <p class="product-info">
 	  <h2 class="name"> {{item.name}} </h2>
 	  <img class="product-image" src="{{item.image}}"/>
-	  <p class="manufacturer"> {{item.manufacturer}} </p>
+	  Manufacturer: {{item.manufacturer}}
 	  <p class="regularPrice"> {{item.regularPrice}} </p>
 	  <p class="onSale"> {{item.onSale}} </p>
 	  <p class="percentSavings"> {{item.percentSavings}} </p>
@@ -21,14 +30,15 @@
 	  <p class="long-description"> {{item.longDescriptione}} </p>
 	  View product <a class="url" href="{{item.url}}" target="_blank"> here </a>
 
-	  <form method="POST" action="/findouttopics">
+	   <form method="POST" action="/findouttopics">
         {% csrf-field %}
 	  	<input class="sku" type="text" visible="false" name="sku" />
   		<input type="submit" name="{{item.sku}}" value="Find out topics!" />
 	  </form>
       {% endfor %}
+    </p>
 	</div>
 
-	<div id="example" style="width: 550px; height: 350px;"></div>
+	<div id="tag-cloud" style="width: 550px; height: 350px;"></div>
 </div>
 {% endblock %}

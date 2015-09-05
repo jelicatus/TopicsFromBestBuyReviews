@@ -28,7 +28,8 @@
                  [local/jml "2.8"]
                  [local/liblinear "1.0"]
                  [local/commons-math "2.2"]
-                 [local/jmathplot "1.0"]]
+                 [local/jmathplot "1.0"]
+                 [hiccup "1.0.5"]]
 
   :min-lein-version "2.0.0"
   :uberjar-name "bestbuytopicreviews.jar"

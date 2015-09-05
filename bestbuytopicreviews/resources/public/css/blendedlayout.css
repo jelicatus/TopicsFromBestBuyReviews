@@ -8,6 +8,9 @@ body{
 	 background-attachment : fixed;
 	 background-size : 100% auto;
 }
+p{
+  color: white;
+}
 .blended_grid{
 	 display : block;
 	 width : 900px;
@@ -35,6 +38,16 @@ body{
 	 clear : none;
 	 height : 100px;
 	 width : 900px;
+}
+
+.product-image{
+  height: 100px;
+  widht: 70px;
+}
+
+.product-info{
+  background-color : rgba(0,9,181,0.4);
+  height: 500px;
 }
 
 /* fonts */
