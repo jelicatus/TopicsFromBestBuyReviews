@@ -5,40 +5,60 @@
 	 Product:
          {% csrf-field %}
 		 <input type="text" name="product" />
-		 <input type="submit" value="Search for product" />
-	Choose product category (...ovde combo...)
+		 <input class="btn" type="submit" value="Search for product" />
 	 </form>
      {% if clouds|empty? %}
     {% else %}
+
     <div>
      {% for cloud in clouds %}
+         <div class="cloud" style=" background: url('../img/cloud.jpg');
+    background-size: 76% 110%;
+    background-repeat: no-repeat; margin: 2%;">
         {{cloud|safe}}
-        <br/><br/><br/><br/><br/>
+        <br/><br/><br/><br/>   <br/></div>
+
+
          {% endfor %}
+
     </div>
     {% endif %}
 	<div id="products">
       {% for item in results %}
-     <p class="product-info">
+     <div class="product-info">
 	  <h2 class="name"> {{item.name}} </h2>
+       <table>
+           <tr>
+           <td rowspan="7">
 	  <img class="product-image" src="{{item.image}}"/>
-	  Manufacturer: {{item.manufacturer}}
-	  <p class="regularPrice"> {{item.regularPrice}} </p>
-	  <p class="onSale"> {{item.onSale}} </p>
-	  <p class="percentSavings"> {{item.percentSavings}} </p>
-	  <p class="salePrice"> {{item.salePrice}} </p>
-	  <p class="long-description"> {{item.longDescriptione}} </p>
-	  View product <a class="url" href="{{item.url}}" target="_blank"> here </a>
-
-	   <form method="POST" action="/findouttopics">
+               </td>
+           </tr>
+           <tr>
+               <td>
+                   Manufacturer: {{item.manufacturer}} </td>
+         </tr>  <tr>
+ <td>	  Reguar price: {{item.regularPrice}} </td>
+              </tr>  <tr>
+          <td>	  On sale: {{item.onSale}} </td>
+                 </tr> <tr>
+       <td>	  Percenatage savings: {{item.percentSavings}} </td>
+                  </tr>  <tr>
+      <td>	  Sale price:  {{item.salePrice}} </td>
+                  </tr>  <tr>
+      <td>  Long description: {{item.longDescription}} </td>
+                  </tr>    <tr>
+    <td>	  View product <a class="url" href="{{item.url}}" target="_blank"> here </a> </td>
+           </tr>
+         </table>
+     <form method="POST" action="/findouttopics">
         {% csrf-field %}
-	  	<input class="sku" type="text" visible="false" name="sku" />
-  		<input type="submit" name="{{item.sku}}" value="Find out topics!" />
+	  	<input class="sku" type="text" hidden="true"  name="sku" value="{{item.sku}}"/>
+  		<input type="submit" class="btn" value="Find out topics!" />
 	  </form>
+         </div>
       {% endfor %}
-    </p>
+
 	</div>
 
-	<div id="tag-cloud" style="width: 550px; height: 350px;"></div>
 </div>
 {% endblock %}
