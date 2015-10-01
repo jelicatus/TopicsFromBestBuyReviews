@@ -24,6 +24,7 @@
                  [org.webjars/jquery "2.1.4"]
                  [org.immutant/web "2.0.2"]
                  [org.clojure/data.json "0.2.6"]
+                 [criterium "0.4.3"]
                  [clj-http "1.1.0"]
                  [local/jml "2.8"]
                  [local/liblinear "1.0"]

@@ -1,4 +1,5 @@
 (ns bestbuytopicreviews.routes.reviews
+  (use 'criterium.core)
   (:require [clojure.string :as string]
             [clj-http.client :as client]
             [bestbuytopicreviews.routes.nmf :as nmf-util]
