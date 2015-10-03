@@ -1,5 +1,4 @@
 (ns bestbuytopicreviews.routes.tagcloud
-  (use 'criterium.core)
   (:require [hiccup.core :as hc]))
 
 ;idea from http://briancarper.net/blog/426/
