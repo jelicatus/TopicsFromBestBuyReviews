@@ -4,7 +4,7 @@ FIXME
 
 ## Topics from best buy reviews
 
-This application is a student project, built for subject Tools and Method of Software engineering at University of Belgrade.
+This application is a student project, built for subject Tools and Methods of Software engineering at University of Belgrade.
 
 ## Prerequisites
 
