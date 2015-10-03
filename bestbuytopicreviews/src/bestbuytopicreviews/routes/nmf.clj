@@ -11,7 +11,7 @@
 ;step2NMF - we set clustering; If null, KMeans will be used for initialization
 ;matrix - represents the indicator matrix of NMF, in our case matrix where rows represent the topics
 (defn perform-nmf [data]
-  (let [nmfopt (jml.options.NMFOptions. 3 true 50),
+  (let [nmfopt (jml.options.NMFOptions. 4 true 50),
        nmfclustering (jml.clustering.NMF. nmfopt),
        step1NMF (feed-data nmfclustering data),
        step2NMF (set-clustering nmfclustering nil),
