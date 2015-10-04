@@ -26,6 +26,7 @@
                  [org.clojure/data.json "0.2.6"]
                  [clj-http "1.1.0"]
                  [local/jml "2.8"]
+                 [local/laml "1.6.2"]
                  [local/liblinear "1.0"]
                  [local/commons-math "2.2"]
                  [local/jmathplot "1.0"]

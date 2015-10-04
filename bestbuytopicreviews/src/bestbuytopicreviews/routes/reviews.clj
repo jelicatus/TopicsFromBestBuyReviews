@@ -2,6 +2,7 @@
   (:require [clojure.string :as string]
             [clj-http.client :as client]
             [bestbuytopicreviews.routes.nmf :as nmf-util]
+            [bestbuytopicreviews.routes.laml :as nmf-laml]
             [bestbuytopicreviews.routes.tagcloud :as tag-cloud-util]))
 
 ;function for Term-Frequency word weighting scheme
@@ -67,6 +68,7 @@
          w-matrix (for [i (range (count frequencies-matrix))] (for [j (range (count sequence-of-frequencies))]
                                                                 (tf-idf (nth (nth frequencies-matrix i) j) number-of-reviews (nth sequence-of-frequencies j)))),
          data (into-array (map double-array w-matrix)),
+         ;t-matrix (nmf-laml/perform-nmf data),
          t-matrix (nmf-util/perform-nmf data),
          topics-with-all-tokens (map #(zipmap tokens %) t-matrix ),
          topics-with-sorted-weight-of-tokens (for [i (range (count topics-with-all-tokens))](sort-by val > (nth topics-with-all-tokens i))),
