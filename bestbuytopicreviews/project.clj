@@ -25,6 +25,7 @@
                  [org.immutant/web "2.0.2"]
                  [org.clojure/data.json "0.2.6"]
                  [clj-http "1.1.0"]
+                 [criterium "0.4.3"]
                  [local/jml "2.8"]
                  [local/laml "1.6.2"]
                  [local/liblinear "1.0"]

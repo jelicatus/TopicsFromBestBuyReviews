@@ -3,9 +3,9 @@
             [compojure.core :refer [defroutes GET POST]]
             [ring.util.http-response :refer [ok]]
             [clojure.java.io :as io]
-            [bestbuytopicreviews.routes.utils :as util]
             [bestbuytopicreviews.routes.products :as products]
-            [bestbuytopicreviews.routes.reviews :as reviews]))
+            [bestbuytopicreviews.routes.reviews :as reviews]
+            [bestbuytopicreviews.routes.performance :as performance]))
 
 (defn index-page
   ([] (layout/render "homepage.html"))
