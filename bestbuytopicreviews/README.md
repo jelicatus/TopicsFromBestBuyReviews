@@ -2,6 +2,10 @@
 
 FIXME
 
+## Topics from best buy reviews
+
+This application is a student project, built for subject Tools and Methods of Software engineering at University of Belgrade.
+
 ## Prerequisites
 
 You will need [Leiningen][1] 2.0 or above installed.
