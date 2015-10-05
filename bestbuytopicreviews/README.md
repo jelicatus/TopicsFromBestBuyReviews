@@ -25,7 +25,3 @@ This application was written in programming language Clojure using [Luminus](htt
 ## Acknowledgements
 
 This application has been developed as a part of the project assignment for the course [Tools and methods of software engineering](http://ai.fon.bg.ac.rs/master/alati-i-metode-softverskog-inzenjerstva/) in master degree program Software engineering at the [Faculty of Organization Sciences](http://www.fon.bg.ac.rs/), University of Belgrade, Serbia.
-
-## License
-
-Copyright © 2015 FIXME
