@@ -3,7 +3,8 @@
             [clj-http.client :as client]
             [bestbuytopicreviews.routes.nmf :as nmf-util]
             [bestbuytopicreviews.routes.laml :as nmf-laml]
-            [bestbuytopicreviews.routes.tagcloud :as tag-cloud-util]))
+            [bestbuytopicreviews.routes.tagcloud :as tag-cloud-util])
+  (import [java.io File]))
 
 ;function for Term-Frequency word weighting scheme
 ;calculated according to http://archimedes.fas.harvard.edu/presentations/2002-03-09/img13.html
@@ -31,7 +32,16 @@
 
 (defn collect-all-reviews [total-page-number sku]
   (let [reviews []]
-        (for [i (range 1 total-page-number)] (conj reviews (request-reviews sku i)))))
+    (for [i (range 1 total-page-number)]
+      (conj reviews (request-reviews sku i)))))
+
+(defn get-reviews-body [sku]
+  (let [path (str "./resources/embedded-file-storage/" sku ".txt")]
+    (if (.exists (File. path))
+      (-> path slurp read-string)
+      (let [body (flatten (collect-all-reviews (take-total-number-of-pages sku) sku))]
+        (spit path (pr-str body))
+        body))))
 
 ;reviews-body - gets the reviews attribute of returned json object using BestBuy API
 ;sequence-of-reviews - returns a sequence whose elements are reviews
@@ -50,8 +60,12 @@
 ;topics-with-sorted-weight-of-tokens - returns a sequence with sorted weight of tokens for each topic
 ;words-for-topics - returns a sequence with 15 most relevant words for each topic
 (defn get-reviews [sku]
-  (let [total-page-number (take-total-number-of-pages sku)
-         reviews-body (flatten (collect-all-reviews total-page-number sku)),
+  (let [;total-page-number (take-total-number-of-pages sku)
+        ; reviews-body1 (flatten (collect-all-reviews total-page-number sku)),
+        ; file-name (str "./resources/embedded-file-storage/" sku ".txt"),
+        ; write (spit file-name (pr-str reviews-body1)),
+       ;  reviews-body (-> file-name slurp read-string),
+         reviews-body (get-reviews-body sku),
          forbidden-words (string/split (slurp "resources/stopwords.txt") #", "),
          punctuation-marks (string/split (slurp "resources/punctuationmarks.txt") #" "),
          sequence-of-reviews (map string/lower-case (map :comment reviews-body)),
@@ -60,18 +74,25 @@
          tokens (distinct (flatten (map #(string/split % #" ") pre-tokens))),
          tokenized-reviews (distinct (map #(string/split % #" ") pre-tokens)),
          frequencies-of-words-reviews (map frequencies tokenized-reviews),
-         frequencies-matrix (for [i (range (count frequencies-of-words-reviews))] (for [j (range (count tokens))]
-                                                                                    (if (= ((nth frequencies-of-words-reviews i) (nth tokens j)) nil) 0 ((nth frequencies-of-words-reviews i) (nth tokens j))))),
-         sequence-of-frequencies (apply map + (for [i (range (count frequencies-of-words-reviews))] (for [j (range (count tokens))]
-                                                                                                      (if (= ((nth frequencies-of-words-reviews i) (nth tokens j)) nil) 0  1)))),
+         frequencies-matrix (for [i (range (count frequencies-of-words-reviews))]
+                              (for [j (range (count tokens))]
+                                (if (= ((nth frequencies-of-words-reviews i) (nth tokens j)) nil)
+                                  0
+                                  ((nth frequencies-of-words-reviews i) (nth tokens j))))),
+         sequence-of-frequencies (apply map + (for [i (range (count frequencies-of-words-reviews))]
+                                                (for [j (range (count tokens))]
+                                                  (if (= ((nth frequencies-of-words-reviews i) (nth tokens j)) nil) 0  1)))),
          number-of-reviews (count sequence-of-reviews),
-         w-matrix (for [i (range (count frequencies-matrix))] (for [j (range (count sequence-of-frequencies))]
-                                                                (tf-idf (nth (nth frequencies-matrix i) j) number-of-reviews (nth sequence-of-frequencies j)))),
+         w-matrix (for [i (range (count frequencies-matrix))]
+                    (for [j (range (count sequence-of-frequencies))]
+                      (tf-idf (nth (nth frequencies-matrix i) j)
+                              number-of-reviews
+                              (nth sequence-of-frequencies j)))),
          data (into-array (map double-array w-matrix)),
          ;t-matrix (nmf-laml/perform-nmf data),
          t-matrix (nmf-util/perform-nmf data),
          topics-with-all-tokens (map #(zipmap tokens %) t-matrix ),
-         topics-with-sorted-weight-of-tokens (for [i (range (count topics-with-all-tokens))](sort-by val > (nth topics-with-all-tokens i))),
-         tag-vectors (map #(take 15 %) topics-with-sorted-weight-of-tokens)
-         ]
-   (map tag-cloud-util/tag-cloud tag-vectors)) )
+         topics-with-sorted-weight-of-tokens (for [i (range (count topics-with-all-tokens))]
+                                               (sort-by val > (nth topics-with-all-tokens i))),
+         tag-vectors (map #(take 15 %) topics-with-sorted-weight-of-tokens)]
+    (map tag-cloud-util/tag-cloud tag-vectors)))

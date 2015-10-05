@@ -12,9 +12,8 @@
 ;matrix - represents the indicator matrix of NMF, in our case matrix where rows represent the topics
 (defn perform-nmf [data]
   (let [nmfopt (jml.options.NMFOptions. 4 true 50),
-       nmfclustering (jml.clustering.NMF. nmfopt),
-       step1NMF (feed-data nmfclustering data),
-       step2NMF (set-clustering nmfclustering nil),
-       matrix  (. nmfclustering (getIndicatorMatrix))
-        ]
-  (apply mapv vector (mapv #(vec (.getRow matrix %)) (range (.getRowDimension matrix))))))
+        nmfclustering (jml.clustering.NMF. nmfopt),
+        step1NMF (feed-data nmfclustering data),
+        step2NMF (set-clustering nmfclustering nil),
+        matrix (. nmfclustering (getIndicatorMatrix))]
+    (apply mapv vector (mapv #(vec (.getRow matrix %)) (range (.getRowDimension matrix))))))

@@ -13,6 +13,7 @@
   ([product] (layout/render "homepage.html" {:results (products/searchforproducts product)})))
 
 (defn cloud-page [sku]
+;  (pr-str  (reviews/get-reviews sku)))
   ;(layout/render "homepage.html" {:clouds  (util/get-reviews sku)})
   (layout/render "homepage.html" {:clouds  (reviews/get-reviews sku)}))
 

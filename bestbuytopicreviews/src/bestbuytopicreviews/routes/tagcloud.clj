@@ -21,12 +21,6 @@
                    [:a {;:href (:url tag)
                         :style (str "font-size: " size "%;"  " position: relative;" " top: " (+ b c)"px; "  " left: -" (+ b c) "px;"  "color:" color)}
                     (str tag)]))]
-(hc/html
-
-           [:div.tag-cloud {:style (str "margin-left: 15%")}
-            (hc/html
-
-                                 (map tag-fn tag-vector)
-                                    );))
-            ]
-)))
+    (hc/html [:div.tag-cloud
+              {:style (str "margin-left: 15%")}
+              (hc/html (map tag-fn tag-vector))])))
